@@ -125,8 +125,8 @@ HTTPCACHE_DIR = "httpcache"
 
 # Set settings whose default value is deprecated to a future-proof value
 # この値は、Pythonの標準ライブラリであるasyncioを利用する非同期リアクターを指定します。
-TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
-FEED_EXPORT_ENCODING = "utf-8"
+# TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
+# FEED_EXPORT_ENCODING = "utf-8"
 
 
 ##########################################
@@ -147,9 +147,10 @@ TIMEZONE = timezone(timedelta(hours=9), "JST")
 # LOGのレベル(CRITICAL > ERROR > WARNING > INFO > DEBUG)
 # 環境変数にSCRAPY__LOG_LEVELがあればそれをログレベルとする。
 LOG_LEVEL: str = str(config("SCRAPY__LOG_LEVEL", default="DEBUG"))
+# LOG_LEVEL: str = "DEBUG"
 
 # 基本的にSCRAPY__LOG_FILEに指定されたprefect側のログファイルを使用する。
-# LOG_FILE = str(config("SCRAPY__LOG_FILE", default="./scrapy.log"))
+LOG_FILE = str(config("SCRAPY__LOG_FILE", default="./scrapy.log"))
 
 # ロギングを有効にするかどうか。
 LOG_ENABLED = True

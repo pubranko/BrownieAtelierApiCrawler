@@ -23,16 +23,16 @@ class NationalDietProceedingsSpider(scrapy.Spider):
     # MongoDB関連
     mongo: MongoModel  # MongoDBへの接続を行うインスタンスをspider内に保持。pipelinesで使用。
 
-    def __init__(self, start_date:str, end_date:str, *args, **kwargs):
-        super(NationalDietProceedingsSpider, self).__init__(*args, **kwargs)
-        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         # 文字列をdate型に変換
-        self.start_date = date.fromisoformat(start_date)
-        self.end_date = date.fromisoformat(end_date)
+        
+        self.start_date = date.fromisoformat(kwargs["start_date"])
+        self.end_date = date.fromisoformat(kwargs["end_date"])
         
         self.api_crawl_input = ApiCrawlInput(
-            start_date=start_date,
-            end_date=end_date,
+            start_date=self.start_date,
+            end_date=self.end_date,
         )
         self.page = 0
         # 

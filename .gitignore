@@ -153,3 +153,5 @@ mongodb/log/mongodb/mongod.log
 
 # prefectのローカルテスト時に作成される不要ファイル
 server.pid
+
+storage/

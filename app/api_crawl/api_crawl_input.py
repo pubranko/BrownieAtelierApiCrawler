@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, date
 from typing import Any, Final, Optional, List
 from urllib.parse import urlparse
 
@@ -43,8 +43,8 @@ class ApiCrawlInput(BaseModel):
     )
     
     # # クロール対象・範囲を指定する任意引数
-    start_date: str = Field(..., title="開始日")
-    end_date: str = Field(..., title="終了日")
+    start_date: date = Field(..., title="開始日")
+    end_date: date = Field(..., title="終了日")
 
     def __init__(self, **data: Any):
         super().__init__(**data)

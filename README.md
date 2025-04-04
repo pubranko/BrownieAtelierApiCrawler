@@ -17,3 +17,7 @@ scrapy genspider national_diet_proceedings kokkai.ndl.go.jp
 - Scrapyのspiderを自動作成してくれる。
 - pydanticの@validatorが非推奨となっている問題が発生。github-copilotに直してと依頼したら直してくれた。
   ただ精度は完全ではなかった。vscodeに上がったエラーを渡して再度修正を依頼したところエラーが解消された。
+
+# prefectプロジェクト作成
+news_crawl側ソースを流用するためgithub-actionsは使えない、、、
+

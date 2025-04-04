@@ -9,6 +9,7 @@ prefect = "3.*"
 pymongo = "4.*"
 slack-sdk = "3.*"
 python-decouple = "*"
+psutil = "*"
 
 [dev-packages]
 
