@@ -7,6 +7,13 @@
 #     https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
 #     https://docs.scrapy.org/en/latest/topics/spider-middleware.html
 
+# デフォルトの設定はこちらにあるようだ。
+# ~.venv/lib/python3.8/site-packages/scrapy/settings/default_settings.py
+import os
+from datetime import timedelta, timezone
+from shutil import which
+from decouple import AutoConfig, config
+
 BOT_NAME = "api_crawl"
 
 SPIDER_MODULES = ["api_crawl.spiders"]
@@ -14,29 +21,45 @@ NEWSPIDER_MODULE = "api_crawl.spiders"
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
+# リクエストに含まれるユーザーエージェントの指定
 #USER_AGENT = "api_crawl (+http://www.yourdomain.com)"
+USER_AGENT = (
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0"
+)
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-#CONCURRENT_REQUESTS = 32
+# 同時平行処理するリクエストの最大値
+CONCURRENT_REQUESTS = 32
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://docs.scrapy.org/en/latest/topics/settings.html#download-delay
 # See also autothrottle settings and docs
-#DOWNLOAD_DELAY = 3
+DOWNLOAD_DELAY = 2
+
 # The download delay setting will honor only one of:
+# webサイトのドメインごとに、同時平行処理するリクエストの最大値
 #CONCURRENT_REQUESTS_PER_DOMAIN = 16
+CONCURRENT_REQUESTS_PER_DOMAIN = 1
+# webサイトのIPごとの同時並行リクエストの最大値。これを指定すると、DOWNLOAD_DELAYもipごとになり、CONCURRENT_REQUESTS_PER_DOMAINは無視される。
 #CONCURRENT_REQUESTS_PER_IP = 16
 
 # Disable cookies (enabled by default)
+# Cookieを有効にするかどうか。
 #COOKIES_ENABLED = False
 
 # Disable Telnet Console (enabled by default)
 #TELNETCONSOLE_ENABLED = False
+# telnet関係の設定は以下のとおり
+# TELNETCONSOLE_HOST = localhost
+# TELNETCONSOLE_PORT = [6023, 6073]
+# TELNETCONSOLE_USERNAME = 'scrapy'
+# TELNETCONSOLE_PASSWORD = scrapy実行時に動的に割当られる。
 
 # Override the default request headers:
+# リクエストにデフォルトで含めるヘッダーをdictで指定する。
 #DEFAULT_REQUEST_HEADERS = {
 #    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
 #    "Accept-Language": "en",
@@ -44,27 +67,31 @@ ROBOTSTXT_OBEY = True
 
 # Enable or disable spider middlewares
 # See https://docs.scrapy.org/en/latest/topics/spider-middleware.html
-#SPIDER_MIDDLEWARES = {
+# スパイダーのミドルウェアを作る場合に使用する。
+SPIDER_MIDDLEWARES = {
 #    "api_crawl.middlewares.ApiCrawlSpiderMiddleware": 543,
-#}
+}
 
 # Enable or disable downloader middlewares
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html
-#DOWNLOADER_MIDDLEWARES = {
+# ダウンロードのミドルウェアを自作のものを使いたい場合、以下の設定を変える。
+DOWNLOADER_MIDDLEWARES = {
 #    "api_crawl.middlewares.ApiCrawlDownloaderMiddleware": 543,
-#}
+}
 
 # Enable or disable extensions
 # See https://docs.scrapy.org/en/latest/topics/extensions.html
+# '<プロジェクト名><ファイル名><クラス名>:優先度
 #EXTENSIONS = {
 #    "scrapy.extensions.telnet.TelnetConsole": None,
 #}
 
 # Configure item pipelines
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    "api_crawl.pipelines.ApiCrawlPipeline": 300,
-#}
+# アイテムのパイプラインの設定
+ITEM_PIPELINES = {
+   "api_crawl.pipelines.ApiCrawlPipeline": 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/autothrottle.html
@@ -81,12 +108,69 @@ ROBOTSTXT_OBEY = True
 
 # Enable and configure HTTP caching (disabled by default)
 # See https://docs.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
+# HTTPキャッシュを使うかどうかの指定。キャッシュを使うと、２回目以降はサーバーにリクエストが送られず、
+# レスポンスがキャッシュから取得できる。
 #HTTPCACHE_ENABLED = True
+HTTPCACHE_ENABLED = False
+# 上記でキャッシュを有効にした場合、有効な秒数を指定。0は無限。 900秒→15分、3600→1時間、86400→1日
 #HTTPCACHE_EXPIRATION_SECS = 0
-#HTTPCACHE_DIR = "httpcache"
+HTTPCACHE_EXPIRATION_SECS = 900  # 3600
+
+# フォルダ名だけ指定した場合、こうなる「〜/myproject/.scrapy/scrapy_httpcache」
+HTTPCACHE_DIR = "httpcache"
+# レスポンスをキャッシュしないHTTPステータスコード。
 #HTTPCACHE_IGNORE_HTTP_CODES = []
+# よくわからないが、ファイル自体のレスポンスに関する何か？
 #HTTPCACHE_STORAGE = "scrapy.extensions.httpcache.FilesystemCacheStorage"
 
 # Set settings whose default value is deprecated to a future-proof value
+# この値は、Pythonの標準ライブラリであるasyncioを利用する非同期リアクターを指定します。
 TWISTED_REACTOR = "twisted.internet.asyncioreactor.AsyncioSelectorReactor"
 FEED_EXPORT_ENCODING = "utf-8"
+
+
+##########################################
+# 拡張してみた
+##########################################
+# 異なるドメインを並列にクロールさせるための設定
+# 単一のドメインへ最適化された設定（デフォルト）
+SCHEDULER_PRIORITY_QUEUE = "scrapy.pqueues.ScrapyPriorityQueue"
+# 広範囲なドメインへ最適化された設定
+# SCHEDULER_PRIORITY_QUEUE = 'scrapy.pqueues.DownloaderAwarePriorityQueue'
+# REACTOR_THREADPOOL_MAXSIZE = 100
+# AJAXCRAWL_ENABLED = True
+
+# 何かしら時間による処理を行いたい場合、使用するタイムゾーンを定義する。
+#  例：spider内のsitemap_fillterで、lastmodの時間を絞り込みしたい。引数に与える時間のタイムゾーンには、settingsのTIME_ZONEを使用する。
+TIMEZONE = timezone(timedelta(hours=9), "JST")
+
+# LOGのレベル(CRITICAL > ERROR > WARNING > INFO > DEBUG)
+# 環境変数にSCRAPY__LOG_LEVELがあればそれをログレベルとする。
+LOG_LEVEL: str = str(config("SCRAPY__LOG_LEVEL", default="DEBUG"))
+
+# 基本的にSCRAPY__LOG_FILEに指定されたprefect側のログファイルを使用する。
+# LOG_FILE = str(config("SCRAPY__LOG_FILE", default="./scrapy.log"))
+
+# ロギングを有効にするかどうか。
+LOG_ENABLED = True
+# LOG_ENABLED = False
+LOG_ENCODING = "utf-8"
+# ログ・メッセージをフォーマットするための文字列。 利用可能なプレース・ホルダーの全リストについては、 Python logging documentation を参照してください。
+LOG_FORMAT = "%(asctime)s %(levelname)-7s [%(name)s] : %(message)s"
+# LOG_FORMAT = '[%(asctime)s] %(levelname)s - %(name)s | %(message)s'
+# 日付/時刻をフォーマットするための文字列、 LOG_FORMAT の %(asctime)s プレース・ホルダーの展開。
+# 利用可能なディレクティブのリストについては、 Python datetime documentation を参照してください。
+LOG_DATEFORMAT = "%Y-%m-%d %H:%M:%S"
+# LOG_DATEFORMAT = '%Y-%m-%d %H:%M:%S%z'
+# LOG_FORMATTER = True
+# True の場合、処理のすべての標準出力(およびエラー)がログにリダイレクトされます。 たとえば、 print('hello') の場合、Scrapyログに表示されます。
+# LOG_STDOUT = False
+# True の場合、ログにはルート・パスのみが含まれます。 False に設定されている場合、ログ出力を担当するコンポーネントが表示されます
+# LOG_SHORT_NAMES = False
+# LogStats による統計の各ログ出力間の間隔(秒単位)。
+# LOGSTATS_INTERVAL = 60.0
+
+# Scrapyのログ設定に関するオプションで、ルートロガーに対してログハンドラーをインストールするかどうかを制御します。
+# この設定は、Scrapyのconfigure_logging関数やCrawlerProcessクラスで使用されます。
+# INSTALL_ROOT_HANDLER = False
+
