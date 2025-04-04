@@ -26,10 +26,10 @@ def api_crawling_task(
     scrapy_settings = get_project_settings()  # Scrapyの設定（api_crawl.settings.py）を取得
     runner = CrawlerRunner(settings=scrapy_settings)
     configure_logging(settings=scrapy_settings, install_root_handler=True)  # Scrapy側でrootロガーへ追加
-    # scrapy_logger = logging.getLogger(
-    #     "scrapy"
-    # )  # ここでscrapyのトップロガーのレベルを設定しないとdebugになってしまう。
-    # scrapy_logger.setLevel(logging.getLevelName(scrapy_settings.get("LOG_LEVEL")))
+    scrapy_logger = logging.getLogger(
+        "scrapy"
+    )  # ここでscrapyのトップロガーのレベルを設定しないとdebugになってしまう。
+    scrapy_logger.setLevel(logging.getLevelName(scrapy_settings.get("LOG_LEVEL")))
 
     for spider_info in crawling_target_spiders:
         runner.crawl(spider_info["class_instans"], **api_crawl_input)

@@ -1,9 +1,6 @@
-import os
 import re
-import io
 from logging import Logger, LoggerAdapter
 from typing import Any, Union
-
 from BrownieAtelierMongo.collection_models.crawler_logs_model import \
     CrawlerLogsModel
 from BrownieAtelierMongo.collection_models.mongo_model import MongoModel
@@ -12,6 +9,7 @@ from BrownieAtelierNotice import settings
 from prefect import get_run_logger, task
 from prefect.context import FlowRunContext
 from prefect_flows.flows import LOG_FILE_PATH, START_TIME
+from prefect.cache_policies import NO_CACHE
 from shared.resource_check import resource_check
 
 """
@@ -22,7 +20,7 @@ mongoDBのインポートを行う。
 """
 
 
-@task(cache_key_fn=lambda context, parameters: "static_cache_key")  # cache_key_fn: タスクのキャッシュ機能で、シリアライズできないkey(mongo)は除外する。
+@task(cache_policy=NO_CACHE)    # cache_policy=NO_CACHE タスクのキャッシュ機能を無効化。内部でシリアライズできないkey(mongo)があるとエラーとなるため。
 def end_task(mongo: MongoModel):
     """Flow共通終了処理"""
 
