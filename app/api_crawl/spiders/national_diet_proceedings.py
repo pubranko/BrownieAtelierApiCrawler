@@ -1,11 +1,9 @@
 import scrapy
+import urllib.parse
 from datetime import datetime, date
 from datetime import datetime, timedelta
-from typing import Union, Any
-from scrapy.http.request.form import FormRequest
+from typing import Any
 from scrapy.http.response.json import JsonResponse
-from scrapy.http.response import Response
-from BrownieAtelierMongo.collection_models.api_crawler_response_model import ApiCrawlerResponseModel
 from api_crawl.items import ApiCrawlItem
 from api_crawl.api_crawl_input import ApiCrawlInput
 from BrownieAtelierMongo.collection_models.mongo_model import MongoModel
@@ -80,10 +78,17 @@ class NationalDietProceedingsSpider(scrapy.Spider):
         else:
             for meeting_record in response.json()["meetingRecord"]:
 
+                # クロール対象のurlより会議日を抽出
+                parsed_url = urllib.parse.urlparse(response.url)
+                query_params = urllib.parse.parse_qs(parsed_url.query)
+                from_date_str = query_params['from'][0]
+                meeting_date = datetime.strptime(from_date_str, '%Y-%m-%d')
+                
                 yield ApiCrawlItem(
                     domain = self.allowed_domains[0],
                     url = response.url,
                     crawling_start_time = self.api_crawl_input.crawling_start_time,
                     response_time = datetime.now().astimezone(self.settings["TIMEZONE"]),
+                    # meeting_date = meeting_date,
                     response = meeting_record,
                 )
