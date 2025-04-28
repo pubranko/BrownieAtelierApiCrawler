@@ -42,7 +42,7 @@ def manual_api_crawling_flow(
 
         except Exception as e:
             # 例外をキャッチしてログ出力等の処理を行う
-            logger.error(f"=== {e}")
+            logger.exception(f"=== {e}")
         finally:
             # 後続の処理を実行する
             end_task(mongo)

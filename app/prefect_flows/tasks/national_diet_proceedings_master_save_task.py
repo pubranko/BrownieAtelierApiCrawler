@@ -2,7 +2,7 @@ from typing import Generator
 from datetime import datetime
 from prefect import get_run_logger, task
 from prefect.cache_policies import NO_CACHE
-from prefect_flows.common.api_crawler_response_get import api_crawler_response_get
+from BrownieAtelierMongo.common.api_crawler_response_get import api_crawler_response_get
 from BrownieAtelierMongo.collection_models.mongo_model import MongoModel
 from BrownieAtelierMongo.collection_models.api_crawler_response_model import ApiCrawlerResponseModel as ApiResponse
 from BrownieAtelierMongo.collection_models.national_diet_proceedings_master_model import NationalDietProceedingsMasterModel as Master

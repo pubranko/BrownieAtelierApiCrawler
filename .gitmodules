@@ -7,3 +7,6 @@
 [submodule "app/BrownieAtelierNotice"]
 	path = app/BrownieAtelierNotice
 	url = https://github.com/pubranko/BrownieAtelierNotice.git
+[submodule "app/BrownieAtelierAnalyzer"]
+	path = app/BrownieAtelierAnalyzer
+	url = https://github.com/pubranko/BrownieAtelierAnalyzer.git

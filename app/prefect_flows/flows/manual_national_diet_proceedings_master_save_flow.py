@@ -34,7 +34,7 @@ def manual_national_diet_proceedings_master_save_flow(
 
         except Exception as e:
             # 例外をキャッチしてログ出力等の処理を行う
-            logger.error(f"=== {e}")
+            logger.exception(f"=== {e}")
         finally:
             # 後続の処理を実行する
             end_task(mongo)
