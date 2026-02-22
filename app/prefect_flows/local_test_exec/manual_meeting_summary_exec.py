@@ -12,8 +12,8 @@ def test_exec():
             # target_meeting_date=date(2025, 4, 17)
             target_crawling_start_time_from=datetime(2025,4,17,0,0,0),
             target_crawling_start_time_to=datetime(2025,4,18,0,0,0),
-            target_meeting_date_from=date(2025,2,26),
-            target_meeting_date_to=date(2025,2,26),
+            target_meeting_date_from=date(2025,1,22),
+            target_meeting_date_to=date(2025,1,22),
 
         )
 

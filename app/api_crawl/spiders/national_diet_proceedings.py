@@ -2,7 +2,7 @@ import scrapy
 import urllib.parse
 from datetime import datetime, date
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, cast, Callable
 from scrapy.http.response.json import JsonResponse
 from api_crawl.items import ApiCrawlItem
 from api_crawl.api_crawl_input import ApiCrawlInput
@@ -48,7 +48,8 @@ class NationalDietProceedingsSpider(scrapy.Spider):
         )  # MongoModelではLoggerAdapterではなくLoggerで定義している。そのためとりあえずLoggerを渡すよう対応中
 
 
-    def start_requests(self):
+    # def start_requests(self):
+    async def start(self):
         self.logger.info(f"start_requests起動")
 
         if not self.start_urls:
@@ -56,8 +57,9 @@ class NationalDietProceedingsSpider(scrapy.Spider):
             return
         
         for url in self.start_urls:
-            any: Any = self.parse   # コードチェックでワーニングが出ないようにAnyとしている。
-            yield scrapy.Request(url, callback=any)
+            # any: Any = self.parse   # コードチェックでワーニングが出ないようにAnyとしている。
+            # yield scrapy.Request(url, callback=any)
+            yield scrapy.Request(url, callback=cast(Callable, self.parse))
 
     def build_url(self, target_date:date):
         base_url = "https://kokkai.ndl.go.jp/api/meeting"

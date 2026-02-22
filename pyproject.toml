@@ -1,0 +1,19 @@
+[project]
+name = "008-brownieatelierapicrawler"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "scrapy>=2,<3",
+    "prefect>=3,<4",
+    "pymongo>=4,<5",
+    "slack-sdk",
+    "python-decouple",
+    "psutil",
+    "mistralai",
+    "ipykernel",
+    "attrdict",
+    "tiktoken",
+    "openai",
+]
